@@ -1,13 +1,12 @@
 using System.Net.Sockets;
-using MessagePack;
 using ProjectUCS.Common.Data;
-using ProjectUCS.Common.Data.Compress;
 using ProjectUCS.Common.Data.Serializer;
 
 namespace ProjectUCS.Common;
 
 public class Connection
 {
+    private const int BufferSize = 1024;
     private readonly PacketBuilder _packetBuilder = new();
     private readonly Socket _socket;
 
@@ -18,7 +17,10 @@ public class Connection
 
         var socketAsyncEventArgs = new SocketAsyncEventArgs();
         socketAsyncEventArgs.Completed += ReceiveCompleted;
-        socket.ReceiveAsync(socketAsyncEventArgs);
+        socketAsyncEventArgs.SetBuffer(new byte[BufferSize], 0, BufferSize);
+        if (socketAsyncEventArgs.Buffer != null)
+            socket.BeginReceive(socketAsyncEventArgs.Buffer, 0, socketAsyncEventArgs.Buffer.Length, SocketFlags.None,
+                null, socketAsyncEventArgs);
     }
 
     public Guid Id { get; } = Guid.NewGuid();
@@ -26,7 +28,7 @@ public class Connection
 
     private void ReceiveCompleted(object? sender, SocketAsyncEventArgs e)
     {
-        if (e.Buffer == null)
+        if (e.Buffer == null || e.BytesTransferred == 0)
         {
             Disconnect();
             return;
@@ -42,13 +44,12 @@ public class Connection
             _packetBuilder.Append(e.Buffer, 0, e.BytesTransferred);
         }
 
-        _socket.ReceiveAsync(e);
+        _socket.BeginReceive(e.Buffer, 0, e.Buffer.Length, SocketFlags.None, null, e);
     }
 
     private void OnPacketCompleted(byte[] buffer)
     {
-        // var uncompressed = DataCompressor.Decompress(buffer);
-        var packet = MessagePackSerializer.Deserialize<RootPacket>(buffer);
+        var packet = PacketSerializer.Deserialize(buffer);
         packet.Handle(this);
     }
 
@@ -65,7 +66,6 @@ public class Connection
 
     private void Send(byte[] buffer)
     {
-        // var compressed = DataCompressor.Compress(buffer);
         var socketAsyncEventArgs = new SocketAsyncEventArgs();
         _socket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, null, socketAsyncEventArgs);
     }

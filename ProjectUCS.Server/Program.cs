@@ -17,7 +17,7 @@ protocol.OnClientConnected += (_, connection) =>
     connection.Send(packet);
 };
 
-protocol.OnClientDisconnected += (_, connection) =>
+protocol.OnClientDisconnected += (_, _) =>
 {
     Console.WriteLine("Client disconnected!");
 };
