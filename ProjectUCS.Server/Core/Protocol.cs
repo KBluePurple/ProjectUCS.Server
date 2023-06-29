@@ -21,6 +21,12 @@ public class Protocol
         remove => _connectionPool.OnConnectionRemoved -= value;
     }
 
+    public event EventHandler<Connection> OnClientDisconnected
+    {
+        add => _connectionPool.OnConnectionRemoved += value;
+        remove => _connectionPool.OnConnectionRemoved -= value;
+    }
+
     public void Start()
     {
         _socket.Listen(10);
@@ -28,11 +34,17 @@ public class Protocol
         var socketAsyncEventArgs = new SocketAsyncEventArgs();
         socketAsyncEventArgs.Completed += AcceptCompleted;
         _socket.AcceptAsync(socketAsyncEventArgs);
+
+        Console.WriteLine($"Server started on port {_socket.LocalEndPoint}");
     }
     
     private void AcceptCompleted(object? sender, SocketAsyncEventArgs e)
     {
         var socket = e.AcceptSocket;
-        socket?.AcceptAsync(e);
+        _connectionPool.Add(socket!);
+        
+        var socketAsyncEventArgs = new SocketAsyncEventArgs();
+        socketAsyncEventArgs.Completed += AcceptCompleted;
+        _socket.AcceptAsync(socketAsyncEventArgs);
     }
 }

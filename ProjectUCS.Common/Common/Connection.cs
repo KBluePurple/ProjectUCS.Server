@@ -1,18 +1,18 @@
 using System.Net.Sockets;
 using MessagePack;
 using ProjectUCS.Common.Data;
+using ProjectUCS.Common.Data.Compress;
+using ProjectUCS.Common.Data.Serializer;
 
 namespace ProjectUCS.Common;
 
 public class Connection
 {
-    private readonly ConnectionPool _connectionPool;
     private readonly PacketBuilder _packetBuilder = new();
     private readonly Socket _socket;
 
-    public Connection(ConnectionPool connectionPool, Socket socket)
+    public Connection(Socket socket)
     {
-        _connectionPool = connectionPool;
         _packetBuilder.OnCompleted += OnPacketCompleted;
         _socket = socket;
 
@@ -22,10 +22,15 @@ public class Connection
     }
 
     public Guid Id { get; } = Guid.NewGuid();
+    public bool IsAlive => _socket.Connected;
 
     private void ReceiveCompleted(object? sender, SocketAsyncEventArgs e)
     {
-        if (e.Buffer == null) return;
+        if (e.Buffer == null)
+        {
+            Disconnect();
+            return;
+        }
 
         if (_packetBuilder.IsNew)
         {
@@ -42,27 +47,28 @@ public class Connection
 
     private void OnPacketCompleted(byte[] buffer)
     {
+        // var uncompressed = DataCompressor.Decompress(buffer);
         var packet = MessagePackSerializer.Deserialize<RootPacket>(buffer);
         packet.Handle(this);
     }
 
-    public void Disconnect()
+    private void Disconnect()
     {
-        _connectionPool.Remove(this);
         _socket.Close();
+        OnDisconnected?.Invoke(this, EventArgs.Empty);
     }
 
-    public void Send(IPacket packet)
+    public void Send<T>(T packet) where T : class, IPacket
     {
-        var data = MessagePackSerializer.Serialize(packet);
-        var root = new RootPacket
-        {
-            Id = packet.GetType().GetHashCode(),
-            Data = data
-        };
-        var buffer = MessagePackSerializer.Serialize(root);
+        Send(PacketSerializer.Serialize(packet));
+    }
 
+    private void Send(byte[] buffer)
+    {
+        // var compressed = DataCompressor.Compress(buffer);
         var socketAsyncEventArgs = new SocketAsyncEventArgs();
         _socket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, null, socketAsyncEventArgs);
     }
+
+    public event EventHandler? OnDisconnected;
 }
