@@ -1,0 +1,1 @@
+﻿namespace ProjectUCS.Common.Test;

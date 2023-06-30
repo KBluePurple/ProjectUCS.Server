@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectUCS.Server", "Projec
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectUCS.Common", "ProjectUCS.Common\ProjectUCS.Common.csproj", "{1234E991-64A3-419C-A3FA-2740CF7163F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectUCS.Server.Test", "ProjectUCS.Server.Test\ProjectUCS.Server.Test.csproj", "{E0DF42A4-AB45-443C-AD09-9AC0C23B12AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectUCS.Common.Test", "ProjectUCS.Common.Test\ProjectUCS.Common.Test.csproj", "{32E18D2D-5DF4-4548-8BB4-E56F835DA536}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{1234E991-64A3-419C-A3FA-2740CF7163F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1234E991-64A3-419C-A3FA-2740CF7163F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1234E991-64A3-419C-A3FA-2740CF7163F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0DF42A4-AB45-443C-AD09-9AC0C23B12AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0DF42A4-AB45-443C-AD09-9AC0C23B12AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0DF42A4-AB45-443C-AD09-9AC0C23B12AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0DF42A4-AB45-443C-AD09-9AC0C23B12AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32E18D2D-5DF4-4548-8BB4-E56F835DA536}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32E18D2D-5DF4-4548-8BB4-E56F835DA536}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32E18D2D-5DF4-4548-8BB4-E56F835DA536}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32E18D2D-5DF4-4548-8BB4-E56F835DA536}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -4,16 +4,17 @@ namespace ProjectUCS.Common.Data;
 
 public static class PacketHandlerManager
 {
+    public static int HandlerCount => Handlers.Count;
     private static readonly Dictionary<int, PacketHandler> Handlers = new();
 
-    public static void RegisterHandlers()
+    public static void RegisterHandlers(Assembly assembly)
     {
-        InitHandlers();
+        InitHandlers(assembly);
     }
 
-    private static void InitHandlers()
+    private static void InitHandlers(Assembly assembly)
     {
-        var types = Assembly.GetExecutingAssembly().GetTypes();
+        var types = assembly.GetTypes();
         foreach (var type in types)
         {
             var attribute = type.GetCustomAttribute<PacketHandlerAttribute>();
@@ -30,7 +31,7 @@ public static class PacketHandlerManager
             var packetType = handlerType.GetGenericArguments()[0];
             packetHandler.Init(packetType);
             
-            Handlers.Add(handlerType.GetHashCode(), packetHandler);
+            Handlers.Add(type.GetHashCode(), packetHandler);
         }
     }
 

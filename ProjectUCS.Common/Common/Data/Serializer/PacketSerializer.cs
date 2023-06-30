@@ -12,11 +12,21 @@ public static class PacketSerializer
             Id = packet.GetType().GetHashCode(),
             Data = data
         };
+        return Serialize(root);
+    }
+
+    private static byte[] Serialize(RootPacket root)
+    {
         return MessagePackSerializer.Serialize(root);
     }
 
     public static RootPacket Deserialize(byte[] data)
     {
         return MessagePackSerializer.Deserialize<RootPacket>(data);
+    }
+    
+    public static object? Deserialize(byte[] data, Type type)
+    {
+        return MessagePackSerializer.Deserialize(type, data);
     }
 }

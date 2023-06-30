@@ -1,6 +1,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 
 #pragma warning disable CS8618
 
@@ -27,5 +28,12 @@ public static class C2S
     public class ChatPacket : IPacket
     {
         [Key(0)] public string Message { get; set; }
+    }
+    
+    [MessagePackObject]
+    public class MovePacket : IPacket
+    {
+        [Key(0)] public int X { get; set; }
+        [Key(1)] public int Y { get; set; }
     }
 }

@@ -1,7 +1,8 @@
-﻿using ProjectUCS.Common.Data;
+﻿using System.Reflection;
+using ProjectUCS.Common.Data;
 using ProjectUCS.Server.Core;
 
-PacketHandlerManager.RegisterHandlers();
+PacketHandlerManager.RegisterHandlers(Assembly.GetExecutingAssembly());
 
 var packet = new C2S.ChatPacket
 {
