@@ -1,13 +1,14 @@
-﻿using ProjectUCS.Common.Data;
+﻿using System.Reflection;
+using ProjectUCS.Common.Data;
 
 namespace ProjectUCS.Common.Test;
 
 public class PacketHandlerManagerTest
 {
-    [Test]
-    public void RegisterHandlersTest()
+    [Test, Order(1)]
+    public void InitTest()
     {
-        PacketHandlerManager.RegisterHandlers(GetType().Assembly);
+        PacketHandlerManager.RegisterHandlers(Assembly.GetExecutingAssembly());
         Assert.That(PacketHandlerManager.HandlerCount, Is.EqualTo(2));
     }
 }

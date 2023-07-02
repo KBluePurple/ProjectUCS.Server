@@ -5,7 +5,6 @@ namespace ProjectUCS.Common.Data;
 [AttributeUsage(AttributeTargets.Class)]
 public class PacketHandlerAttribute : Attribute
 {
-
     public void Handle(Connection connection, RootPacket rootPacket)
     {
         var type = GetType();

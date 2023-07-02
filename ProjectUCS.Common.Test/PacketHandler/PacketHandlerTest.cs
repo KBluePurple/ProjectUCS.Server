@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using ProjectUCS.Common.Data;
+﻿using ProjectUCS.Common.Data;
 using ProjectUCS.Common.Data.Serializer;
 
 namespace ProjectUCS.Common.Test;
@@ -7,12 +6,6 @@ namespace ProjectUCS.Common.Test;
 public class PacketHandlerTest
 {
     public static bool Handled;
-    
-    [SetUp]
-    public void Setup()
-    {
-        PacketHandlerManager.RegisterHandlers(Assembly.GetExecutingAssembly());
-    }
 
     [Test]
     public void GetPacketTest()
@@ -22,13 +15,9 @@ public class PacketHandlerTest
             Message = "Test"
         };
 
-        var root = new RootPacket
-        {
-            Id = packet.GetType().GetHashCode(),
-            Data = PacketSerializer.Serialize(packet)
-        };
+        var root = PacketSerializer.Serialize(packet);
 
-        PacketHandlerManager.Handle(null!, root);
+        PacketHandlerManager.Handle(null!, PacketSerializer.Deserialize(root));
 
         Assert.That(Handled, Is.True);
     }

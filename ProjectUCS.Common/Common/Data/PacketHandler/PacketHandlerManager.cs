@@ -18,20 +18,9 @@ public static class PacketHandlerManager
         foreach (var type in types)
         {
             var attribute = type.GetCustomAttribute<PacketHandlerAttribute>();
-            
             if (attribute == null) continue;
-            
-            var packetHandler = Activator.CreateInstance(type) as PacketHandler;
-            
-            if (packetHandler == null) continue;
-            
-            var handlerType = type.GetInterfaces()
-                .First(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IPacketHandler<>));
-            
-            var packetType = handlerType.GetGenericArguments()[0];
-            packetHandler.Init(packetType);
-            
-            Handlers.Add(type.GetHashCode(), packetHandler);
+            if (Activator.CreateInstance(type) is not PacketHandler packetHandler) continue;
+            Handlers.Add(packetHandler.PacketType.GetHashCode(), packetHandler);
         }
     }
 

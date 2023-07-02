@@ -7,18 +7,18 @@ namespace ProjectUCS.Common.Data;
 public abstract class PacketHandler
 {
     private readonly MethodInfo _handleMethod;
-    private Type _type;
 
     protected PacketHandler()
     {
-        _type = GetType();
-        _handleMethod = _type.GetMethod("Handle", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        PacketType = GetType().GetInterfaces()
+            .First(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IPacketHandler<>))
+            .GetGenericArguments()[0];
+        
+        _handleMethod = GetType().GetMethod("Handle", BindingFlags.Instance | BindingFlags.Public)!;
+        if (_handleMethod == null) throw new NullReferenceException();
     }
 
-    public void Init(Type packetType)
-    {
-        _type = packetType;
-    }
+    public Type PacketType { get; private set; }
 
     public void HandleRoot(Connection connection, RootPacket root)
     {
@@ -28,7 +28,7 @@ public abstract class PacketHandler
 
     private object GetPacket(RootPacket root)
     {
-        var packet = PacketSerializer.Deserialize(root.Data, _type);
+        var packet = PacketSerializer.Deserialize(root.Data, PacketType);
         return packet ?? throw new NullReferenceException();
     }
 }
