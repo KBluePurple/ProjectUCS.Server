@@ -69,6 +69,12 @@ public class Connection
         var socketAsyncEventArgs = new SocketAsyncEventArgs();
         _socket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, null, socketAsyncEventArgs);
     }
+    
+    public void Handled<T>(T packet) where T : class, IPacket
+    {
+        OnPacketReceived?.Invoke(this, packet);
+    }
 
     public event EventHandler? OnDisconnected;
+    public event EventHandler<IPacket>? OnPacketReceived;
 }

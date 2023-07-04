@@ -29,11 +29,54 @@ public static class C2S
     {
         [Key(0)] public string Message { get; set; }
     }
-    
-    [MessagePackObject]
-    public class MovePacket : IPacket
+
+    public static class Room
     {
-        [Key(0)] public int X { get; set; }
-        [Key(1)] public int Y { get; set; }
+        [MessagePackObject]
+        public class MovePacket : IPacket
+        {
+            [Key(0)] public int X { get; set; }
+            [Key(1)] public int Y { get; set; }
+        }
+    }
+}
+
+public static class S2C
+{
+    [MessagePackObject]
+    public class ChatPacket : IPacket
+    {
+        [Key(0)] public int UserId { get; set; }
+        [Key(1)] public string Message { get; set; }
+    }
+
+    public static class Room
+    {
+        [MessagePackObject]
+        public class MovePacket : IPacket
+        {
+            [Key(0)] public int UserId { get; set; }
+            [Key(1)] public int X { get; set; }
+            [Key(2)] public int Y { get; set; }
+        }
+        
+        [MessagePackObject]
+        public class RoomInfoPacket : IPacket
+        {
+            [Key(0)] public int MaxPlayers { get; set; }
+            [Key(1)] public int CurrentPlayers { get; set; }
+        }
+        
+        [MessagePackObject]
+        public class PlayerJoinedPacket : IPacket
+        {
+            [Key(0)] public Guid UserId { get; set; }
+        }
+        
+        [MessagePackObject]
+        public class PlayerLeftPacket : IPacket
+        {
+            [Key(0)] public Guid UserId { get; set; }
+        }
     }
 }
