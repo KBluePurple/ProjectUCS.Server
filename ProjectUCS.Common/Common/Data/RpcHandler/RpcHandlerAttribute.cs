@@ -20,37 +20,33 @@ public class RpcHandlerAttribute : Attribute
 
 public static class RpcHandleManager
 {
-    private static readonly Dictionary<Type, List<Action<Connection, IPacket>>> Events = new();
+    private static readonly Dictionary<Type, List<(MethodInfo method, RpcHandler instance)>> Events = new();
     public static int HandlerCount => Events.Count;
 
     public static void Handle(Connection connection, IPacket packet)
     {
         if (Events.TryGetValue(packet.GetType(), out var actions))
-            actions.ForEach(x => x(connection, packet));
+            actions.ForEach(x => x.method.Invoke(x.instance, new object[] { connection, packet }));
     }
 
-    public static void Register(RpcHandlerAttribute attribute, MethodInfo method, object instance)
+    public static void Register(RpcHandlerAttribute attribute, (MethodInfo method, RpcHandler instance) handler)
     {
-        var action =
-            (Action<Connection, IPacket>)Delegate.CreateDelegate(typeof(Action<Connection, IPacket>), instance, method);
         if (Events.TryGetValue(attribute.PacketType, out var events))
-            events.Add(action);
+            events.Add(handler);
         else
-            Events.Add(attribute.PacketType, new List<Action<Connection, IPacket>> { action });
+            Events.Add(attribute.PacketType, new List<(MethodInfo method, RpcHandler instance)> { handler });
     }
 
-    public static void Unregister(RpcHandlerAttribute attribute, MethodInfo method, object instance)
+    public static void Unregister(RpcHandlerAttribute attribute, (MethodInfo method, RpcHandler instance) handler)
     {
-        var action =
-            (Action<Connection, IPacket>)Delegate.CreateDelegate(typeof(Action<Connection, IPacket>), instance, method);
         if (Events.TryGetValue(attribute.PacketType, out var events))
-            events.Remove(action);
+            events.Remove(handler);
     }
 }
 
 public abstract class RpcHandler : IDisposable
 {
-    private readonly Dictionary<Type, Action<Connection, IPacket>> _handlers = new();
+    private readonly Dictionary<Type, (MethodInfo, RpcHandler)> _handlers = new();
 
     protected RpcHandler()
     {
@@ -64,23 +60,14 @@ public abstract class RpcHandler : IDisposable
             var attribute = method.GetCustomAttribute<RpcHandlerAttribute>();
             if (attribute == null) continue;
 
-            _handlers.Add(attribute.PacketType,
-                (connection, packet) => method.Invoke(this, new object[] { connection, packet }));
-
-            RpcHandleManager.Register(attribute, method, this);
+            _handlers.Add(attribute.PacketType, (method, this));
+            RpcHandleManager.Register(attribute, _handlers[attribute.PacketType]);
         }
     }
 
     public void Dispose()
     {
         foreach (var (packetType, _) in _handlers)
-            RpcHandleManager.Unregister(new RpcHandlerAttribute(packetType), GetType().GetMethod(packetType.Name)!,
-                this);
-    }
-
-    private void Handle(Connection connection, IPacket packet)
-    {
-        if (_handlers.TryGetValue(packet.GetType(), out var handler))
-            handler(connection, packet);
+            RpcHandleManager.Unregister(new RpcHandlerAttribute(packetType), _handlers[packetType]);
     }
 }
