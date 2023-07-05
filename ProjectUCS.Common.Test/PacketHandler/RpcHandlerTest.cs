@@ -17,6 +17,7 @@ public class RpcHandlerTest
 
         var test = new Test();
         RpcHandleManager.Handle(null!, packet);
+        test.Dispose();
 
         Assert.That(IsCalled, Is.True);
     }

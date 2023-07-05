@@ -1,6 +1,7 @@
-namespace ProjectUCS.Common.Data;
-
-public interface IPacketHandler<in TPacket> where TPacket : class
+namespace ProjectUCS.Common.Data
 {
-    void Handle(Connection connection, TPacket packet);
+    public interface IPacketHandler<in TPacket> where TPacket : class
+    {
+        void Handle(Connection connection, TPacket packet);
+    }
 }

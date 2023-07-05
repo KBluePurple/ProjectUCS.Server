@@ -1,28 +1,32 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
-namespace ProjectUCS.Common.Data;
-
-public static class PacketManager
+namespace ProjectUCS.Common.Data
 {
-    static PacketManager()
+    public static class PacketManager
     {
-        RegisterPackets(Assembly.GetExecutingAssembly());
-    }
-    
-    private static readonly Dictionary<int, Type> Packets = new();
+        private static readonly Dictionary<int, Type> Packets = new Dictionary<int, Type>();
 
-    private static void RegisterPackets(Assembly assembly)
-    {
-        var types = assembly.GetTypes().Where(x => x.GetInterfaces().Contains(typeof(IPacket)));
+        static PacketManager()
+        {
+            RegisterPackets(Assembly.GetExecutingAssembly());
+        }
 
-        foreach (var type in types) Packets.Add(type.GetHashCode(), type);
-    }
+        private static void RegisterPackets(Assembly assembly)
+        {
+            var types = assembly.GetTypes().Where(x => x.GetInterfaces().Contains(typeof(IPacket)));
 
-    public static Type GetPacketType(int id)
-    {
-        if (!Packets.TryGetValue(id, out var type))
-            throw new Exception($"Packet with id {id} not found!");
+            foreach (var type in types) Packets.Add(type.GetHashCode(), type);
+        }
 
-        return type;
+        public static Type GetPacketType(int id)
+        {
+            if (!Packets.TryGetValue(id, out var type))
+                throw new Exception($"Packet with id {id} not found!");
+
+            return type;
+        }
     }
 }

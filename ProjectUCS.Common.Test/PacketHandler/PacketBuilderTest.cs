@@ -5,7 +5,7 @@ namespace ProjectUCS.Common.Test;
 
 public class PacketBuilderTest
 {
-    private bool _completed;
+    private int _susses = 0;
     
     [Test]
     public void BuildTest()
@@ -17,17 +17,19 @@ public class PacketBuilderTest
 
         var serialized = PacketSerializer.Serialize(packet);
         var builder = new PacketBuilder();
-        builder.Init(serialized.Length);
 
         builder.OnCompleted += buffer =>
         {
-            var root = PacketSerializer.DeserializeRoot(buffer);
-            _completed = true;
-            Assert.That(root, Is.Not.Null);
+            Assert.That(serialized, Is.EqualTo(buffer));
+            _susses++;
         };
 
-        for (var i = 0; i < serialized.Length; i++) builder.Append(serialized, i, 1);
+        builder.Init((uint)serialized.Length);
+        for (var i = 0; i < serialized.Length; i += 2) builder.Append(serialized, (uint)i, 2);
+        Assert.That(_susses, Is.EqualTo(1));
         
-        Assert.That(_completed, Is.True);
+        builder.Init((uint)serialized.Length);
+        for (var i = 0; i < serialized.Length; i += 2) builder.Append(serialized, (uint)i, 2);
+        Assert.That(_susses, Is.EqualTo(2));
     }
 }

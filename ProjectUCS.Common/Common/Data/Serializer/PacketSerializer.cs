@@ -1,39 +1,41 @@
-﻿using MessagePack;
+﻿using System;
+using MessagePack;
 
-namespace ProjectUCS.Common.Data.Serializer;
-
-public static class PacketSerializer
+namespace ProjectUCS.Common.Data.Serializer
 {
-    public static byte[] Serialize<TPacket>(TPacket packet) where TPacket : class, IPacket
+    public static class PacketSerializer
     {
-        var data = MessagePackSerializer.Serialize(packet);
-        var root = new RootPacket
+        public static byte[] Serialize<TPacket>(TPacket packet) where TPacket : class, IPacket
         {
-            Id = packet.GetType().GetHashCode(),
-            Data = data
-        };
-        return Serialize(root);
-    }
+            var data = MessagePackSerializer.Serialize(packet);
+            var root = new RootPacket
+            {
+                Id = packet.GetType().GetHashCode(),
+                Data = data
+            };
+            return Serialize(root);
+        }
 
-    private static byte[] Serialize(RootPacket root)
-    {
-        return MessagePackSerializer.Serialize(root);
-    }
+        private static byte[] Serialize(RootPacket root)
+        {
+            return MessagePackSerializer.Serialize(root);
+        }
 
-    public static IPacket Deserialize(byte[] data)
-    {
-        var root = MessagePackSerializer.Deserialize<RootPacket>(data);
-        return Deserialize(root.Data, root.Id);
-    }
+        public static IPacket Deserialize(byte[] data)
+        {
+            var root = MessagePackSerializer.Deserialize<RootPacket>(data);
+            return Deserialize(root.Data, root.Id);
+        }
 
-    public static IPacket Deserialize(byte[] data, int id)
-    {
-        var type = PacketManager.GetPacketType(id);
-        return (IPacket?)MessagePackSerializer.Deserialize(type, data) ?? throw new InvalidOperationException();
-    }
+        public static IPacket Deserialize(byte[] data, int id)
+        {
+            var type = PacketManager.GetPacketType(id);
+            return (IPacket)MessagePackSerializer.Deserialize(type, data) ?? throw new InvalidOperationException();
+        }
 
-    public static RootPacket DeserializeRoot(byte[] data)
-    {
-        return MessagePackSerializer.Deserialize<RootPacket>(data);
+        public static RootPacket DeserializeRoot(byte[] data)
+        {
+            return MessagePackSerializer.Deserialize<RootPacket>(data);
+        }
     }
 }

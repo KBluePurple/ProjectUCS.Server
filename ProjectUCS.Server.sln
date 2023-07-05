@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectUCS.Server.Test", "P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectUCS.Common.Test", "ProjectUCS.Common.Test\ProjectUCS.Common.Test.csproj", "{32E18D2D-5DF4-4548-8BB4-E56F835DA536}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientTest", "ClientTest\ClientTest.csproj", "{808D7C7C-52FD-46E6-8322-F2D82A4E39C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{32E18D2D-5DF4-4548-8BB4-E56F835DA536}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32E18D2D-5DF4-4548-8BB4-E56F835DA536}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32E18D2D-5DF4-4548-8BB4-E56F835DA536}.Release|Any CPU.Build.0 = Release|Any CPU
+		{808D7C7C-52FD-46E6-8322-F2D82A4E39C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{808D7C7C-52FD-46E6-8322-F2D82A4E39C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{808D7C7C-52FD-46E6-8322-F2D82A4E39C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{808D7C7C-52FD-46E6-8322-F2D82A4E39C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

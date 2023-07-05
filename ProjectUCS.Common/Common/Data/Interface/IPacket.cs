@@ -1,5 +1,6 @@
-namespace ProjectUCS.Common.Data;
-
-public interface IPacket
+namespace ProjectUCS.Common.Data
 {
+    public interface IPacket
+    {
+    }
 }

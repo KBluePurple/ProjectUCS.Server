@@ -1,9 +1,10 @@
 ﻿using ProjectUCS.Common;
 using ProjectUCS.Common.Data;
+using ProjectUCS.Common.Data.RpcHandler;
 
 namespace ProjectUCS.Server.Room;
 
-public class BaseRoom : IDisposable
+public class BaseRoom : RpcHandler
 {
     private readonly List<Connection> _connections = new();
     private readonly int _maxPlayers;
@@ -42,9 +43,15 @@ public class BaseRoom : IDisposable
     {
         foreach (var connection in _connections) connection.Send(packet);
     }
-
-    public void Dispose()
+    
+    [RpcHandler(typeof(C2S.Room.MovePacket))]
+    private void OnMove(Connection connection, IPacket packet)
     {
-        
+        var movePacket = (C2S.Room.MovePacket) packet;
+        Broadcast(new S2C.Room.MovePacket
+        {
+            UserId = connection.Id,
+            Position = movePacket.Position,
+        });
     }
 }
