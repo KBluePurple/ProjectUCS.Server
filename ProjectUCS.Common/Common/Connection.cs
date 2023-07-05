@@ -50,7 +50,7 @@ public class Connection
     private void OnPacketCompleted(byte[] buffer)
     {
         var packet = PacketSerializer.Deserialize(buffer);
-        packet.Handle(this);
+        PacketHandlerManager.Handle(this, packet);
     }
 
     private void Disconnect()

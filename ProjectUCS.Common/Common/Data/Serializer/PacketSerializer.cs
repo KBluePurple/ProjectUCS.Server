@@ -20,13 +20,20 @@ public static class PacketSerializer
         return MessagePackSerializer.Serialize(root);
     }
 
-    public static RootPacket Deserialize(byte[] data)
+    public static IPacket Deserialize(byte[] data)
+    {
+        var root = MessagePackSerializer.Deserialize<RootPacket>(data);
+        return Deserialize(root.Data, root.Id);
+    }
+
+    public static IPacket Deserialize(byte[] data, int id)
+    {
+        var type = PacketManager.GetPacketType(id);
+        return (IPacket?)MessagePackSerializer.Deserialize(type, data) ?? throw new InvalidOperationException();
+    }
+
+    public static RootPacket DeserializeRoot(byte[] data)
     {
         return MessagePackSerializer.Deserialize<RootPacket>(data);
-    }
-    
-    public static object? Deserialize(byte[] data, Type type)
-    {
-        return MessagePackSerializer.Deserialize(type, data);
     }
 }

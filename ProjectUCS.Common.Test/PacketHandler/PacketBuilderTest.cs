@@ -21,7 +21,7 @@ public class PacketBuilderTest
 
         builder.OnCompleted += buffer =>
         {
-            var root = PacketSerializer.Deserialize(buffer);
+            var root = PacketSerializer.DeserializeRoot(buffer);
             _completed = true;
             Assert.That(root, Is.Not.Null);
         };

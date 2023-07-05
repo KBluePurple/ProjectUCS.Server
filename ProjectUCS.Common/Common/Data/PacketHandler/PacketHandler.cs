@@ -20,15 +20,8 @@ public abstract class PacketHandler
 
     public Type PacketType { get; private set; }
 
-    public void HandleRoot(Connection connection, RootPacket root)
+    public void HandlePacket(Connection connection, IPacket packet)
     {
-        var packet = GetPacket(root);
-        _handleMethod.Invoke(this, new[] { connection, packet });
-    }
-
-    private object GetPacket(RootPacket root)
-    {
-        var packet = PacketSerializer.Deserialize(root.Data, PacketType);
-        return packet ?? throw new NullReferenceException();
+        _handleMethod.Invoke(this, new object[] {connection, packet});
     }
 }

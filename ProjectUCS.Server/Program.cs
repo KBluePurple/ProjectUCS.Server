@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using ProjectUCS.Common;
 using ProjectUCS.Common.Data;
+using ProjectUCS.Common.Data.RpcHandler;
 using ProjectUCS.Server.Core;
 using ProjectUCS.Server.Room;
 
@@ -21,20 +22,13 @@ protocol.OnClientDisconnected += (_, _) => { Console.WriteLine("Client disconnec
 
 await Task.Delay(-1);
 
-[RpcHandler(typeof(C2S.ChatPacket))]
-void OnChatPacket(Connection connection, C2S.ChatPacket packet)
+[UseRpc]
+class Test
 {
-    Console.WriteLine($"Message: {packet.Message}");
-    connection.Send(packet);
-}
-
-[AttributeUsage(AttributeTargets.Method)]
-public class RpcHandlerAttribute : Attribute
-{
-    public Type PacketType { get; }
-
-    public RpcHandlerAttribute(Type packetType)
+    [RpcHandler(typeof(C2S.ChatPacket))]
+    void OnChatPacket(Connection connection, C2S.ChatPacket packet)
     {
-        PacketType = packetType;
+        Console.WriteLine($"Message: {packet.Message}");
+        connection.Send(packet);
     }
 }

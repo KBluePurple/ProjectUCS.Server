@@ -1,10 +1,17 @@
-﻿using ProjectUCS.Common.Data;
+﻿using System.Reflection;
+using ProjectUCS.Common.Data;
 using ProjectUCS.Common.Data.Serializer;
 
 namespace ProjectUCS.Common.Test;
 
 public class PacketHandlerTest
 {
+    [SetUp]
+    public void Setup()
+    {
+        PacketHandlerManager.RegisterHandlers(Assembly.GetExecutingAssembly());
+    }
+    
     public static bool Handled;
 
     [Test]

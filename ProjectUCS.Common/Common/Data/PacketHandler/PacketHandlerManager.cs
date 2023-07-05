@@ -20,13 +20,14 @@ public static class PacketHandlerManager
             var attribute = type.GetCustomAttribute<PacketHandlerAttribute>();
             if (attribute == null) continue;
             if (Activator.CreateInstance(type) is not PacketHandler packetHandler) continue;
+            if (Handlers.ContainsKey(packetHandler.PacketType.GetHashCode())) continue;
             Handlers.Add(packetHandler.PacketType.GetHashCode(), packetHandler);
         }
     }
 
-    public static void Handle(Connection connection, RootPacket rootPacket)
+    public static void Handle(Connection connection, IPacket packet)
     {
-        if (!Handlers.TryGetValue(rootPacket.Id, out var handler)) return;
-        handler.HandleRoot(connection, rootPacket);
+        if (!Handlers.TryGetValue(packet.GetType().GetHashCode(), out var handler)) return;
+        handler.HandlePacket(connection, packet);
     }
 }

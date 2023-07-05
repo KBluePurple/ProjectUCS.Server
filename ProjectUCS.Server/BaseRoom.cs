@@ -3,7 +3,7 @@ using ProjectUCS.Common.Data;
 
 namespace ProjectUCS.Server.Room;
 
-public class BaseRoom
+public class BaseRoom : IDisposable
 {
     private readonly List<Connection> _connections = new();
     private readonly int _maxPlayers;
@@ -41,5 +41,10 @@ public class BaseRoom
     public void Broadcast<T>(T packet) where T : class, IPacket
     {
         foreach (var connection in _connections) connection.Send(packet);
+    }
+
+    public void Dispose()
+    {
+        
     }
 }

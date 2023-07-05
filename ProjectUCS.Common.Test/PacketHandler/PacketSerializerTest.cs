@@ -15,16 +15,15 @@ public class PacketSerializerTest
     public void SerializeAndDeserializeTest()
     {
         var data = PacketSerializer.Serialize(_packet);
-        var root = PacketSerializer.Deserialize(data);
-        
-        var packet = PacketSerializer.Deserialize(root.Data, _packet.GetType());
+        var root = PacketSerializer.DeserializeRoot(data);
+        var packet = PacketSerializer.DeserializeRoot(data);
 
         Assert.Multiple(() =>
         {
             Assert.That(root.Id, Is.EqualTo(_packet.GetType().GetHashCode()));
             Assert.That(root.Data, Is.EqualTo(MessagePackSerializer.Serialize(_packet)));
             Assert.That(data, Is.EqualTo(MessagePackSerializer.Serialize(root)));
-            Assert.That(MessagePackSerializer.Serialize(_packet), Is.EqualTo(MessagePackSerializer.Serialize(packet)));
+            Assert.That(MessagePackSerializer.Serialize(_packet), Is.EqualTo(packet.Data));
         });
     }
 }

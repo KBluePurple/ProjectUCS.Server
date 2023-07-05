@@ -1,9 +1,15 @@
-﻿namespace ProjectUCS.Common.Test;
+﻿using System.Reflection;
+using ProjectUCS.Common.Data;
+
+namespace ProjectUCS.Common.Test;
 
 public class SetupTest
 {
-    [SetUp]
-    public void Setup()
+    [Test]
+    [Order(-10)]
+    public void InitTest()
     {
+        PacketHandlerManager.RegisterHandlers(Assembly.GetExecutingAssembly());
+        Assert.That(PacketHandlerManager.HandlerCount, Is.EqualTo(2));
     }
 }
