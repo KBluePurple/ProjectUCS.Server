@@ -4,6 +4,7 @@ using ProjectUCS.Common.Data;
 using ProjectUCS.Common.Data.RpcHandler;
 using ProjectUCS.Server.Core;
 using ProjectUCS.Server.Room;
+// ReSharper disable UnusedMember.Local
 
 PacketHandlerManager.RegisterHandlers(Assembly.GetExecutingAssembly());
 
@@ -20,16 +21,12 @@ var square = new BaseRoom(10);
 protocol.OnClientConnected += (_, connection) =>
 {
     Console.WriteLine("Client connected!");
-    // square.AddPlayer(connection);
-    
-    Task.Run(() =>
+    var welcomePacket = new S2C.WelcomePacket
     {
-        while (connection.IsAlive)
-        {
-            connection.Send(helloPacket);
-            Task.Delay(1000).Wait();
-        }
-    });
+        UserId = connection.Id,
+    };
+    connection.Send(welcomePacket);
+    square.AddPlayer(connection);
 };
 
 protocol.OnClientDisconnected += (_, _) => { Console.WriteLine("Client disconnected!"); };
@@ -43,5 +40,17 @@ internal class Test : RpcHandler
     {
         Console.WriteLine($"Message: {packet.Message}");
         connection.Send(packet);
+    }
+    
+    [RpcHandler(typeof(C2S.Room.MovePacket))]
+    private void OnMovePacket(Connection connection, C2S.Room.MovePacket packet)
+    {
+        Console.WriteLine($"Move: {packet.Position.X}, {packet.Position.Y}");
+        var movePacket = new S2C.Room.MovePacket
+        {
+            UserId = connection.Id,
+            Position = packet.Position
+        };
+        connection.Send(movePacket);
     }
 }

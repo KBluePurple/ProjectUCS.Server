@@ -24,12 +24,12 @@ public class PacketBuilderTest
             _susses++;
         };
 
-        builder.Init((uint)serialized.Length);
-        for (var i = 0; i < serialized.Length; i += 2) builder.Append(serialized, (uint)i, 2);
+        builder.Init(serialized.Length);
+        for (var i = 0; i < serialized.Length; i += 2) builder.Append(serialized, i, 2);
         Assert.That(_susses, Is.EqualTo(1));
         
-        builder.Init((uint)serialized.Length);
-        for (var i = 0; i < serialized.Length; i += 2) builder.Append(serialized, (uint)i, 2);
+        builder.Init(serialized.Length);
+        for (var i = 0; i < serialized.Length; i += 2) builder.Append(serialized, i, 2);
         Assert.That(_susses, Is.EqualTo(2));
     }
 }

@@ -23,42 +23,50 @@ namespace ProjectUCS.Common
         public Guid Id { get; } = Guid.NewGuid();
         public bool IsAlive => _socket.Connected;
 
-        private void Received(IAsyncResult ar)
+        private void Received(IAsyncResult ar) // 나중에 정리할 코드
         {
-            var bytesTransferred = (uint)_socket.EndReceive(ar);
-            uint offset = 0;
-
-            Console.WriteLine($"Received: {Convert.ToBase64String(_buffer, 0, (int)bytesTransferred)}");
-
-            if (bytesTransferred == 0)
+            try
             {
-                Disconnect();
-                return;
-            }
+                var bytesTransferred = _socket.EndReceive(ar);
+                var offset = 0;
 
-            while (bytesTransferred - offset > 0)
-            {
-                if (_packetBuilder.IsNew)
+                if (bytesTransferred == 0)
                 {
-                    var packetSize = BitConverter.ToUInt32(_buffer, 0);
-                    _packetBuilder.Init(packetSize);
-                    offset += 4;
-                    continue;
+                    Disconnect();
+                    return;
                 }
 
-                if (_packetBuilder.Offset + bytesTransferred - offset > _packetBuilder.Size)
+                while (bytesTransferred - offset > 0)
                 {
-                    var count = _packetBuilder.Size - _packetBuilder.Offset;
-                    _packetBuilder.Append(_buffer, offset, count);
-                    offset += count;
-                    continue;
+                    if (_packetBuilder.IsNew)
+                    {
+                        // 패킷 사이즈 정보가 잘리면 버그 발생
+                        if (bytesTransferred - offset < 4) break;
+                        var packetSize = (int)BitConverter.ToUInt32(_buffer, offset);
+                        _packetBuilder.Init(packetSize);
+                        offset += 4;
+                        continue;
+                    }
+
+                    if (_packetBuilder.Offset + bytesTransferred - offset > _packetBuilder.Size)
+                    {
+                        var count = _packetBuilder.Size - _packetBuilder.Offset;
+                        _packetBuilder.Append(_buffer, offset, count);
+                        offset += count;
+                        continue;
+                    }
+
+                    _packetBuilder.Append(_buffer, offset, bytesTransferred - offset);
+                    offset += bytesTransferred;
                 }
                 
-                _packetBuilder.Append(_buffer, offset, bytesTransferred - offset);
-                offset += bytesTransferred;
+                _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, Received, null);
             }
-            
-            _socket.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, Received, null);
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception: {e.Message}\n{e.StackTrace}");
+                Disconnect();
+            }
         }
 
         private void OnPacketCompleted(byte[] buffer)
@@ -75,9 +83,10 @@ namespace ProjectUCS.Common
             OnDisconnected?.Invoke(this, EventArgs.Empty);
         }
 
-        public void Send<T>(T packet) where T : class, IPacket
+        public void Send<T>(T packet) where T : IPacket
         {
-            Send(PacketSerializer.Serialize(packet));
+            var serialized = PacketSerializer.Serialize(packet);
+            Send(serialized);
         }
 
         private void Send(byte[] buffer)
@@ -85,8 +94,6 @@ namespace ProjectUCS.Common
             var size = BitConverter.GetBytes((uint)buffer.Length);
             _socket.BeginSend(size, 0, size.Length, SocketFlags.None, null, null);
             _socket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, null, null);
-
-            Console.WriteLine($"Sent: {Convert.ToBase64String(buffer)}");
         }
 
         private void Handled<T>(T packet) where T : class, IPacket

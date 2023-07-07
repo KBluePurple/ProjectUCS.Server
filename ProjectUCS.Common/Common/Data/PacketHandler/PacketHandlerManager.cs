@@ -22,14 +22,14 @@ namespace ProjectUCS.Common.Data
                 var attribute = type.GetCustomAttribute<PacketHandlerAttribute>();
                 if (attribute == null) continue;
                 if (!(Activator.CreateInstance(type) is PacketHandler packetHandler)) continue;
-                if (Handlers.ContainsKey(packetHandler.PacketType.GetHashCode())) continue;
-                Handlers.Add(packetHandler.PacketType.GetHashCode(), packetHandler);
+                if (Handlers.ContainsKey(packetHandler.PacketType.GetHash())) continue;
+                Handlers.Add(packetHandler.PacketType.GetHash(), packetHandler);
             }
         }
 
         public static void Handle(Connection connection, IPacket packet)
         {
-            if (!Handlers.TryGetValue(packet.GetType().GetHashCode(), out var handler)) return;
+            if (!Handlers.TryGetValue(packet.GetType().GetHash(), out var handler)) return;
             handler.HandlePacket(connection, packet);
         }
     }

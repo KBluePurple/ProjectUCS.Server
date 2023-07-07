@@ -5,12 +5,12 @@ namespace ProjectUCS.Common.Data.Serializer
 {
     public static class PacketSerializer
     {
-        public static byte[] Serialize<TPacket>(TPacket packet) where TPacket : class, IPacket
+        public static byte[] Serialize<TPacket>(TPacket packet) where TPacket : IPacket
         {
             var data = MessagePackSerializer.Serialize(packet);
             var root = new RootPacket
             {
-                Id = packet.GetType().GetHashCode(),
+                Id = packet.GetType().GetHash(),
                 Data = data
             };
             return Serialize(root);

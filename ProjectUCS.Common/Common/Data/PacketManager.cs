@@ -18,7 +18,7 @@ namespace ProjectUCS.Common.Data
         {
             var types = assembly.GetTypes().Where(x => x.GetInterfaces().Contains(typeof(IPacket)));
 
-            foreach (var type in types) Packets.Add(type.GetHashCode(), type);
+            foreach (var type in types) Packets.Add(type.GetHash(), type);
         }
 
         public static Type GetPacketType(int id)

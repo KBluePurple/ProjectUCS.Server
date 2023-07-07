@@ -29,8 +29,6 @@ namespace ClientTest
             Console.WriteLine($"Connected: {socket.Connected}");
             
             var connection = new Connection(socket);
-
-            connection.OnPacketReceived += (_, packet) => { Console.WriteLine(packet.GetType()); };
         }
     }
 
@@ -40,6 +38,15 @@ namespace ClientTest
         private void OnChatPacket(Connection connection, S2C.ChatPacket packet)
         {
             Console.WriteLine($"Message: {packet.Message}");
+            
+            connection.Send(new C2S.Room.MovePacket
+            {
+                Position = new Position
+                {
+                    X = 1,
+                    Y = 1
+                }
+            });
         }
     }
 }

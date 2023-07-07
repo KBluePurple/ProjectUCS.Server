@@ -1,12 +1,14 @@
 using System;
+using ProjectUCS.Common.Data.Serializer;
 
 namespace ProjectUCS.Common.Data
 {
     public class PacketBuilder
     {
         private byte[] _buffer;
-        private uint _offset;
-        private uint _size;
+        private int _offset;
+        private int _size;
+        private object _lock = new object();
 
         public PacketBuilder()
         {
@@ -17,34 +19,36 @@ namespace ProjectUCS.Common.Data
 
         public bool IsNew { get; private set; } = true;
         public bool IsCompleted => _offset == _size;
-        public uint Offset => _offset;
-        public uint Size => _size;
+        public int Offset => _offset;
+        public int Size => _size;
 
         public event Action<byte[]> OnCompleted;
 
-        public void Init(uint packetSize)
+        public void Init(int packetSize)
         {
-            IsNew = false;
-            _offset = 0;
-            _size = packetSize;
-            _buffer = new byte[packetSize];
-
-            Console.WriteLine($"Packet size: {packetSize}");
+            lock (_lock)
+            {
+                IsNew = false;
+                _offset = 0;
+                _size = packetSize;
+                _buffer = new byte[packetSize];
+            }
         }
 
-        public void Append(byte[] buffer, uint offset, uint count)
+        public void Append(byte[] buffer, int offset, int count)
         {
-            if (_offset + count > _size)
-                throw new Exception("Invalid packet size.");
+            lock (_lock)
+            {
+                if (_offset + count > _size)
+                    throw new Exception("Invalid packet size.");
 
-            Console.WriteLine($"Append: {count}");
-            
-            Array.Copy(buffer, offset, _buffer, _offset, count);
-            _offset += count;
+                Array.Copy(buffer, offset, _buffer, _offset, count);
+                _offset += count;
 
-            if (_offset != _size) return;
-            OnCompleted?.Invoke(_buffer);
-            IsNew = true;
+                if (_offset != _size) return;
+                OnCompleted?.Invoke(_buffer);
+                IsNew = true;
+            }
         }
     }
 }

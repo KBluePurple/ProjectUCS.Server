@@ -39,7 +39,7 @@ public class BaseRoom : RpcHandler
         _connections.Remove(connection);
     }
 
-    public void Broadcast<T>(T packet) where T : class, IPacket
+    public void Broadcast<T>(T packet) where T : IPacket
     {
         foreach (var connection in _connections) connection.Send(packet);
     }
