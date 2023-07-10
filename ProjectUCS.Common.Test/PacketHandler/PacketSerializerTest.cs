@@ -44,5 +44,15 @@ public class PacketSerializerTest
             Assert.That(data2, Is.EqualTo(MessagePackSerializer.Serialize(root2)));
             Assert.That(MessagePackSerializer.Serialize(_helloPacket), Is.EqualTo(packet2.Data));
         });
+
+        var packetData =
+            Convert.FromBase64String(
+                "ks4VO13RxDKS2SQwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDCSyj+AAADKP4AAAA==");
+        
+        for (var i = 0; i < 100000; i++)
+        {
+            var deserializedPacket = PacketSerializer.Deserialize(packetData);
+            Console.WriteLine($"{deserializedPacket.GetType()}");
+        }
     }
 }

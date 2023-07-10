@@ -21,11 +21,10 @@ public class BaseRoom : RpcHandler
 
         _connections.Add(connection);
         connection.OnDisconnected += (_, _) => RemovePlayer(connection);
-        connection.OnPacketReceived += (_, packet) => Broadcast(packet);
 
         foreach (var player in _connections)
             connection.Send(new S2C.Room.PlayerJoinedPacket { UserId = player.Id });
-        
+
         Broadcast(new S2C.Room.PlayerJoinedPacket { UserId = connection.Id });
     }
 
@@ -33,25 +32,25 @@ public class BaseRoom : RpcHandler
     {
         if (!_connections.Contains(connection))
             throw new Exception("Player is not in the room!");
-        
-        Broadcast(new S2C.Room.PlayerLeftPacket { UserId = connection.Id });
 
         _connections.Remove(connection);
+        Broadcast(new S2C.Room.PlayerLeftPacket { UserId = connection.Id });
     }
 
     public void Broadcast<T>(T packet) where T : IPacket
     {
         foreach (var connection in _connections) connection.Send(packet);
     }
-    
+
     [RpcHandler(typeof(C2S.Room.MovePacket))]
-    private void OnMove(Connection connection, IPacket packet)
+    private void OnMove(Connection connection, C2S.Room.MovePacket packet)
     {
-        var movePacket = (C2S.Room.MovePacket) packet;
         Broadcast(new S2C.Room.MovePacket
         {
             UserId = connection.Id,
-            Position = movePacket.Position,
+            Position = new Position { X = packet.Position.X, Y = packet.Position.Y }
         });
+
+        // Console.WriteLine($"Move: {packet.Position.X}, {packet.Position.Y}");
     }
 }

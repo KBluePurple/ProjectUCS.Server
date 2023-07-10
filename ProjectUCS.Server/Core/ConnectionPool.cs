@@ -5,7 +5,7 @@ namespace ProjectUCS.Server.Core;
 
 public class ConnectionPool
 {
-    private readonly Dictionary<Guid, Connection> _connections = new();
+    private readonly Dictionary<int, Connection> _connections = new();
     public event EventHandler<Connection>? OnConnectionCreated;
     public event EventHandler<Connection>? OnConnectionRemoved;
 
@@ -24,7 +24,7 @@ public class ConnectionPool
         OnConnectionRemoved?.Invoke(this, connection);
     }
 
-    public Connection Get(Guid id)
+    public Connection Get(int id)
     {
         return _connections[id];
     }

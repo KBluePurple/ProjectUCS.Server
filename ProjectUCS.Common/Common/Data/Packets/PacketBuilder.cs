@@ -8,7 +8,7 @@ namespace ProjectUCS.Common.Data
         private byte[] _buffer;
         private int _offset;
         private int _size;
-        private object _lock = new object();
+        private readonly object _lock = new object();
 
         public PacketBuilder()
         {
@@ -32,6 +32,7 @@ namespace ProjectUCS.Common.Data
                 _offset = 0;
                 _size = packetSize;
                 _buffer = new byte[packetSize];
+                // Console.WriteLine($"PacketBuilder Init {packetSize}");
             }
         }
 
@@ -44,6 +45,8 @@ namespace ProjectUCS.Common.Data
 
                 Array.Copy(buffer, offset, _buffer, _offset, count);
                 _offset += count;
+
+                // Console.WriteLine($"PacketBuilder Append {count}({offset})\n{Convert.ToBase64String(buffer.AsSpan(offset, count).ToArray())}");
 
                 if (_offset != _size) return;
                 OnCompleted?.Invoke(_buffer);

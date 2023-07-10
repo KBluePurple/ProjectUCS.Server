@@ -29,6 +29,24 @@ namespace ClientTest
             Console.WriteLine($"Connected: {socket.Connected}");
             
             var connection = new Connection(socket);
+            
+            await Task.Run(() =>
+            {
+                while (true)
+                {
+                    var packet = new C2S.Room.MovePacket
+                    {
+                        Position = new Position
+                        {
+                            X = 1,
+                            Y = 1
+                        }
+                    };
+                    
+                    connection.Send(packet);
+                    Task.Delay(100).Wait();
+                }
+            });
         }
     }
 
@@ -47,6 +65,12 @@ namespace ClientTest
                     Y = 1
                 }
             });
+        }
+        
+        [RpcHandler(typeof(S2C.Room.MovePacket))]
+        private void OnMovePacket(Connection connection, S2C.Room.MovePacket packet)
+        {
+            Console.WriteLine($"Position: {packet.Position.X}, {packet.Position.Y}");
         }
     }
 }
