@@ -48,9 +48,6 @@ namespace ProjectUCS.Common
         {
             Interlocked.Add(ref _writeOffset, bytesTransferred);
 
-            Console.WriteLine($"받은 패킷: {bytesTransferred}");
-            Console.WriteLine(BitConverter.ToString(_receiveBuffer, 0, bytesTransferred));
-
             if (bytesTransferred == 0)
             {
                 Disconnect();
@@ -65,19 +62,15 @@ namespace ProjectUCS.Common
                     // 패킷 빌더 초기화
                     if (RemainSize < 4)
                     {
-                        Console.WriteLine("패킷 사이즈가 덜도착함, 기다렸다가 다음에 받을 생각");
                         break;
                     }
 
                     InitPacketBuilder();
-                    Console.WriteLine(BitConverter.ToString(_receiveBuffer, _readOffset, 4));
                     Interlocked.Add(ref _readOffset, 4);
-                    Console.WriteLine($"새로운 패킷 사이즈: {_packetBuilder.Size}");
                 }
 
                 var count = Math.Min(_packetBuilder.Size - _packetBuilder.Offset, RemainSize);
                 if (count == 0) break;
-                Console.WriteLine($"패킷 받음: {count}");
                 _packetBuilder.Append(_receiveBuffer, _readOffset, count);
                 Interlocked.Add(ref _readOffset, count);
             }

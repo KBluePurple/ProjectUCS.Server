@@ -31,7 +31,7 @@ public class BaseRoom : RpcHandler
     public void RemovePlayer(Connection connection)
     {
         if (!_connections.Contains(connection))
-            throw new Exception("Player is not in the room!");
+            return;
 
         _connections.Remove(connection);
         Broadcast(new S2C.Room.PlayerLeftPacket { UserId = connection.Id });
@@ -50,7 +50,5 @@ public class BaseRoom : RpcHandler
             UserId = connection.Id,
             Position = new Position { X = packet.Position.X, Y = packet.Position.Y }
         });
-
-        // Console.WriteLine($"Move: {packet.Position.X}, {packet.Position.Y}");
     }
 }

@@ -33,7 +33,6 @@ namespace ProjectUCS.Common.Data.Serializer
         {
             lock (Lock)
             {
-                Console.WriteLine(BitConverter.ToString(data));
                 var root = MessagePackSerializer.Deserialize<RootPacket>(data);
                 return Deserialize(root.Data, root.Id);
             }
