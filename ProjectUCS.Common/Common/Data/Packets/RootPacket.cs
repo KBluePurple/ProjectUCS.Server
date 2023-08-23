@@ -5,7 +5,6 @@
 
 #pragma warning disable CS8618
 
-using System;
 using MessagePack;
 
 namespace ProjectUCS.Common.Data
@@ -33,6 +32,16 @@ namespace ProjectUCS.Common.Data
         {
             [Key(0)] public string Message { get; set; }
         }
+        
+        [MessagePackObject]
+        public struct StartMatchPacket : IPacket
+        {
+        }
+        
+        [MessagePackObject]
+        public struct CancelMatchPacket : IPacket
+        {
+        }
 
         public static class Room
         {
@@ -58,6 +67,28 @@ namespace ProjectUCS.Common.Data
         {
             [Key(0)] public int UserId { get; set; }
         }
+        
+        [MessagePackObject]
+        public struct MatchingStartedPacket : IPacket 
+        {
+        }
+        
+        [MessagePackObject]
+        public struct MatchingStoppedPacket : IPacket 
+        {
+        }
+        
+        [MessagePackObject]
+        public struct MatchingEndedPacket : IPacket 
+        {
+        }
+        
+        [MessagePackObject]
+        public struct MatchInfoPacket : IPacket 
+        {
+            [Key(0)] public int MaxPlayers { get; set; }
+            [Key(1)] public int CurrentPlayers { get; set; }
+        }
 
         public static class Room
         {
@@ -66,6 +97,11 @@ namespace ProjectUCS.Common.Data
             {
                 [Key(0)] public int UserId { get; set; }
                 [Key(1)] public Position Position { get; set; }
+            }
+            
+            [MessagePackObject]
+            public struct RoomWelcomePacket : IPacket
+            {
             }
 
             [MessagePackObject]

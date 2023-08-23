@@ -13,8 +13,13 @@ public class BaseRoom : RpcHandler
     {
         _maxPlayers = maxPlayers;
     }
+    
+    public int PlayerCount => _connections.Count;
+    public int MaxPlayers => _maxPlayers;
+    public bool IsFull => _connections.Count >= _maxPlayers;
+    public IEnumerable<Connection> Players => _connections;
 
-    public void AddPlayer(Connection connection)
+    public virtual void AddPlayer(Connection connection)
     {
         if (_connections.Count >= _maxPlayers)
             throw new Exception("Room is full!");
@@ -28,7 +33,7 @@ public class BaseRoom : RpcHandler
         Broadcast(new S2C.Room.PlayerJoinedPacket { UserId = connection.Id });
     }
 
-    public void RemovePlayer(Connection connection)
+    public virtual void RemovePlayer(Connection connection)
     {
         if (!_connections.Contains(connection))
             return;
@@ -36,19 +41,14 @@ public class BaseRoom : RpcHandler
         _connections.Remove(connection);
         Broadcast(new S2C.Room.PlayerLeftPacket { UserId = connection.Id });
     }
-
-    public void Broadcast<T>(T packet) where T : IPacket
-    {
-        foreach (var connection in _connections) connection.Send(packet);
+    
+    public virtual void RemoveAllPlayers()
+    {   
+        _connections.Clear();
     }
 
-    [RpcHandler(typeof(C2S.Room.MovePacket))]
-    private void OnMove(Connection connection, C2S.Room.MovePacket packet)
+    public virtual void Broadcast<T>(T packet) where T : IPacket
     {
-        Broadcast(new S2C.Room.MovePacket
-        {
-            UserId = connection.Id,
-            Position = new Position { X = packet.Position.X, Y = packet.Position.Y }
-        });
+        foreach (var connection in _connections) connection.Send(packet);
     }
 }
