@@ -6,14 +6,14 @@ namespace ProjectUCS.Server.Room;
 
 public class BaseRoom : RpcHandler
 {
-    private readonly List<Connection> _connections = new();
-    private readonly int _maxPlayers;
-
-    public BaseRoom(int maxPlayers = 4)
+    public BaseRoom(int maxPlayers = 2)
     {
         _maxPlayers = maxPlayers;
     }
-    
+
+    protected readonly List<Connection> _connections = new();
+    private readonly int _maxPlayers;
+
     public int PlayerCount => _connections.Count;
     public int MaxPlayers => _maxPlayers;
     public bool IsFull => _connections.Count >= _maxPlayers;
@@ -24,11 +24,11 @@ public class BaseRoom : RpcHandler
         if (_connections.Count >= _maxPlayers)
             throw new Exception("Room is full!");
 
-        _connections.Add(connection);
-        connection.OnDisconnected += (_, _) => RemovePlayer(connection);
-
         foreach (var player in _connections)
             connection.Send(new S2C.Room.PlayerJoinedPacket { UserId = player.Id });
+
+        _connections.Add(connection);
+        connection.OnDisconnected += (_, _) => RemovePlayer(connection);
 
         Broadcast(new S2C.Room.PlayerJoinedPacket { UserId = connection.Id });
     }

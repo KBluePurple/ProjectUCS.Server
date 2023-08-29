@@ -57,17 +57,23 @@ public class Matching : BaseRoom
 {
     public override void AddPlayer(Connection connection)
     {
-        base.AddPlayer(connection);
         connection.Send(new S2C.MatchInfoPacket
         {
             CurrentPlayers = PlayerCount,
             MaxPlayers = MaxPlayers
         });
+        
+        _connections.Add(connection);
+        connection.OnDisconnected += (_, _) => RemovePlayer(connection);
+        
+        Console.WriteLine("Player joined!");
 
         if (!IsFull) return;
         Broadcast(new S2C.MatchingEndedPacket());
         MakeGameRoom();
         RemoveAllPlayers();
+
+        Console.WriteLine("Game room created!");
     }
 
     private void MakeGameRoom()
@@ -77,6 +83,8 @@ public class Matching : BaseRoom
         {
             room.AddPlayer(player);
         }
+
+        Console.WriteLine("Game room created!");
     }
 }
 
