@@ -95,4 +95,15 @@ public class GameRoom : BaseRoom
         connection.Send(new S2C.Room.RoomWelcomePacket());
         base.AddPlayer(connection);
     }
+
+    [RpcHandler(typeof(C2S.Room.MovePacket))]
+    private void Move(Connection connection, C2S.Room.MovePacket packet)
+    {
+        Broadcast(new S2C.Room.MovePacket
+        {
+            UserId = connection.Id,
+            Position = packet.Position,
+            Horizontal = packet.Horizontal
+        });
+    }
 }

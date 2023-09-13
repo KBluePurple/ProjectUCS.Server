@@ -49,6 +49,12 @@ namespace ProjectUCS.Common.Data
             public struct MovePacket : IPacket
             {
                 [Key(0)] public Position Position { get; set; }
+                [Key(1)] public int Horizontal { get; set; }
+            }
+
+            [MessagePackObject]
+            public struct AttackPacket : IPacket
+            {
             }
         }
     }
@@ -97,6 +103,7 @@ namespace ProjectUCS.Common.Data
             {
                 [Key(0)] public int UserId { get; set; }
                 [Key(1)] public Position Position { get; set; }
+                [Key(2)] public int Horizontal { get; set; }
             }
             
             [MessagePackObject]
@@ -119,6 +126,12 @@ namespace ProjectUCS.Common.Data
 
             [MessagePackObject]
             public struct PlayerLeftPacket : IPacket
+            {
+                [Key(0)] public int UserId { get; set; }
+            }
+
+            [MessagePackObject]
+            public struct AttackPacket : IPacket
             {
                 [Key(0)] public int UserId { get; set; }
             }
