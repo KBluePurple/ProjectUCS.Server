@@ -106,4 +106,13 @@ public class GameRoom : BaseRoom
             Horizontal = packet.Horizontal
         });
     }
+
+    [RpcHandler(typeof(C2S.Room.AttackPacket))]
+    private void Attack(Connection connection, C2S.Room.AttackPacket packet)
+    {
+        Broadcast(new S2C.Room.AttackPacket
+        {
+            UserId = connection.Id
+        });
+    }
 }
